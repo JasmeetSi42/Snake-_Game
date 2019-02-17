@@ -1,0 +1,362 @@
+#include<iostream>
+#include<stdlib.h>
+#include<vector>
+#include<fstream>
+#include<curses.h>
+int last_x;
+int last_y;
+using namespace std;
+class Snake
+{
+	public:
+	int x;
+	int y;
+	char value;
+	public :
+	void head_set(int &a,int &b)
+	{
+		cin>>x>>y;
+		a=x;
+		b=y;
+		value='H';
+	}
+	void set(int a,int &b)
+	{
+		x=a;
+		y=++b;
+		value='#';
+	}
+	void tail_set(int a,int &b)
+	{
+		x=a;
+		y=++b;
+		value='T';
+	}
+	void update(int a,int b)
+	{
+		x=a;
+		y=b;
+	}
+	void setValue(char ch)
+	{
+		value=ch;
+	}
+	int getX()
+	{
+		return x;
+	}
+	int getY()
+	{
+		return y;
+	}
+	char getValue()
+	{
+		return value;
+	}
+};
+class Food
+{
+
+	int x;
+	int y;
+	char value;
+	public :
+	Food()
+	{
+		x=y=0;
+		value='F';
+	}
+	Food(int x1,int y1)
+	{
+		x=x1;
+		y=y1;
+		value='F';
+	}
+	void update(int x1,int y1)
+	{
+		x=x1;
+		y=y1;
+	}
+	void setValue(char ch)
+	{
+		value=ch;
+	}
+	char getvalue()
+	{
+		return value;
+	}
+	int getX()
+	{
+		return x;
+	}
+	int getY()
+	{
+		return y;
+	}
+};
+void print(char Board[20][80])
+{
+	int i,j;
+	for(i=0;i<20;i++)
+	{
+		for(j=0;j<80;j++)
+		{
+			cout<<Board[i][j];
+		}
+		cout<<endl;
+	}
+}
+
+void Left(char Board[20][80],vector<Snake> &v)
+{
+	int index_x=v[0].getX(),index_y=v[0].getY();
+	if(index_y==0)
+	{
+		v[0].update(index_x,79);
+		Board[index_x][79]=v[0].value;
+	}
+	else
+	{
+		v[0].update(index_x,index_y-1);
+		Board[index_x][index_y-1]=v[0].value;
+	}
+	last_x=v[v.size()-1].getX(),last_y=v[v.size()-1].getY();
+	for(int i=v.size()-1;i>1;i--)
+	{
+	
+		v[i].update(v[i-1].getX(),v[i-1].getY());
+	}
+	v[1].update(index_x,index_y);
+	for(int i=1;i<v.size();i++)
+	{
+	index_x=v[i].getX();
+	index_y=v[i].getY();
+	Board[index_x][index_y]=v[i].value;
+	}
+		Board[index_x][index_y]=v[v.size()-1].value;
+		Board[last_x][last_y]=' ';
+
+}
+void Right(char Board[20][80],vector<Snake> &v)
+{
+	int index_x=v[0].getX(),index_y=v[0].getY();
+	if(index_y==79)
+	{
+		v[0].update(index_x,0);
+		Board[index_x][0]=v[0].value;
+	}
+	else
+	{
+		v[0].update(index_x,index_y+1);
+		Board[index_x][index_y+1]=v[0].value;
+	}	
+	last_x=v[v.size()-1].getX(),last_y=v[v.size()-1].getY();
+	for(int i=v.size()-1;i>1;i--)
+	{
+		v[i].update(v[i-1].getX(),v[i-1].getY());
+	}
+	v[1].update(index_x,index_y);
+	for(int i=1;i<v.size();i++)
+	{
+	index_x=v[i].getX();
+	index_y=v[i].getY();
+	Board[index_x][index_y]=v[i].value;
+	}
+		Board[index_x][index_y]=v[v.size()-1].value;
+		Board[last_x][last_y]=' ';
+
+}
+
+void Down(char Board[20][80],vector<Snake> &v)
+{
+	int index_x=v[0].getX(),index_y=v[0].getY();
+	if(index_x==19)
+	{
+		v[0].update(0,index_y);
+		Board[0][index_y]=v[0].value;
+	}
+	else
+	{
+		v[0].update(index_x+1,index_y);
+		Board[index_x+1][index_y]=v[0].value;
+	}	
+	last_x=v[v.size()-1].getX(),last_y=v[v.size()-1].getY();
+	for(int i=v.size()-1;i>1;i--)
+	{
+	
+		v[i].update(v[i-1].getX(),v[i-1].getY());
+	}
+	v[1].update(index_x,index_y);
+	for(int i=1;i<v.size();i++)
+	{
+	index_x=v[i].getX();
+	index_y=v[i].getY();
+	Board[index_x][index_y]=v[i].value;
+	}
+		Board[index_x][index_y]=v[v.size()-1].value;
+		Board[last_x][last_y]=' ';
+
+}
+void Up(char Board[20][80],vector<Snake> &v)
+{
+	int index_x=v[0].getX(),index_y=v[0].getY();
+	if(index_x==0)
+	{
+		v[0].update(19,index_y);
+		Board[19][index_y]=v[0].value;
+	}
+	else
+	{
+		v[0].update(index_x-1,index_y);
+		Board[index_x-1][index_y]=v[0].value;
+	}
+	last_x=v[v.size()-1].getX(),last_y=v[v.size()-1].getY();
+	for(int i=v.size()-1;i>1;i--)
+	{
+	
+		v[i].update(v[i-1].getX(),v[i-1].getY());
+	}
+	v[1].update(index_x,index_y);
+	for(int i=1;i<v.size();i++)
+	{
+	index_x=v[i].getX();
+	index_y=v[i].getY();
+	Board[index_x][index_y]=v[i].value;
+	}
+		Board[index_x][index_y]=v[v.size()-1].value;
+		Board[last_x][last_y]=' ';
+
+}
+void print_vector(vector<Snake> v);
+void Move(char Board[20][80],char ch,vector<Snake> &v)
+{
+	int index_x,index_y;
+	index_x=v[0].getX();
+	index_y=v[0].getY();
+	int flag=0;
+	if(ch=='u')
+	{
+		if(index_x-1!=v[1].getX())
+		{
+			Up(Board,v);
+		}
+	}
+	else if(ch=='d')
+	{
+		if((index_x+1)!=(v[1].getX()))
+		{
+			Down(Board,v);
+		}
+	}
+	else if(ch=='l')
+	{
+		if(index_y-1!=v[1].getY())
+		{
+			Left(Board,v);
+		}
+	}
+	else if(ch=='r')
+	{
+		if(index_y+1!=v[1].getY())
+		{
+			Right(Board,v);
+		}
+	}
+}
+void print_vector(vector<Snake> v)
+{
+	for(int i=0;i<v.size();i++)
+	{
+		cout<<v[i].getX()<<v[i].getY()<<v[i].getValue()<<endl;
+	}
+}
+bool Snake_Crash(vector<Snake> &v)
+{
+	int index_x=v[0].getX();
+	int index_y=v[0].getY();
+	for(int i=1;i<v.size();i++)
+	{
+		if(v[i].getX()==index_x&&index_y==v[i].getY())
+		{
+			return true;
+		}
+	}
+return false;
+}
+void FoodMet(Food &f,char Board[20][80],vector<Snake> &v)
+{
+	static int X=13,Y=13;
+	if(f.getX()==v[0].getX()&&f.getY()==v[0].getY())
+	{
+		f.update(rand()%20,rand()%80);
+		Board[f.getX()][f.getY()]=f.getvalue();
+		v[v.size()-1].update(v[v.size()-1].getX(),v[v.size()-1].getY());
+		v[v.size()-1].setValue('#');
+		Board[v[v.size()-1].getX()][v[v.size()-1].getY()]='#';
+		v.resize(v.size()+1);
+		v[v.size()-1].update(last_x,last_y);
+		v[v.size()-1].setValue('T');
+		Board[last_x][last_y]='T';
+	}
+}
+int main()
+{
+	int x,y;
+	Food f;
+	vector<Snake> v(5);
+	char choice;
+	char Board[20][80]={};
+	for(int i=0;i<20;i++)
+	{
+		for(int j=0;j<80;j++)
+		{
+			Board[i][j]=' ';
+		}
+	}
+	cin>>x>>y;
+	f.update(x,y);
+	Board[f.getX()][f.getY()]=f.getvalue();
+	int initial_x=0,initial_y=0;	
+	v[0].head_set(initial_x,initial_y);
+	y=initial_y;
+	for(int i=1;i<v.size()-1;i++)
+	{
+		v[i].set(initial_x,initial_y);
+	}
+	v[v.size()-1].tail_set(initial_x,initial_y);
+	int value_setter=0;	
+	for(y;y<=initial_y;y++)
+	{
+		Board[initial_x][y]=v[value_setter].getValue();
+		value_setter++;
+	}
+	cout<<"Enter the operation Up Down Right Left";
+	char  ch;
+	print(Board);
+	int flag=0;
+	for(int i=0;true;i++)
+	{
+		cin>>ch;	
+		Move(Board,ch,v);
+		if(v.size()==1600)
+		{
+			cout<<"Congratulations";
+			break;
+		}
+		if(Snake_Crash(v))
+		{
+			
+			flag=1;
+			break;
+		}
+			
+		FoodMet(f,Board,v);
+		print(Board);
+		//system("clear");											//Used For Clearing the Screen
+	}	
+	if(flag==1)
+	{
+		cout<<"Game Over";
+	}
+	return 0;
+}
