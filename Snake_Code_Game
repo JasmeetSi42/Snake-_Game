@@ -1,5 +1,5 @@
-///Snake Games
-// #PKMKB
+///Snake Game
+//Code
 #include<iostream>
 #include<stdlib.h>
 #include<vector>
